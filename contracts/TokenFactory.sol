@@ -107,6 +107,11 @@ contract TokenFactory {
         );
         userLoggedIn[msg.sender] = false;
     }
+
+    // check user logged in or not to persist the state after relaod
+    function checkUserLoggedIn() public view returns (bool) {
+        return userLoggedIn[msg.sender];
+    }
 }
 
 // swaping of tokens

@@ -3,7 +3,7 @@ import TokenFactory from "./artifacts/contracts/TokenFactory.sol/TokenFactory.js
 import { useState, useEffect } from "react";
 import Auth from "./components/Auth";
 function App() {
-  const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+  const contractAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
 
   // * current contract object
   const [contract, setContract] = useState();
@@ -52,11 +52,7 @@ function App() {
 
   return (
     <div className="container">
-      <Auth
-        contractAddress={contractAddress}
-        contract={contract}
-        account={account}
-      />
+      <Auth contract={contract} account={account} />
     </div>
   );
 }

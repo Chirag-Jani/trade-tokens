@@ -142,6 +142,11 @@ contract TokenFactory {
         userLoggedIn[msg.sender] = false;
     }
 
+    // to check if user logged in or not
+    function checkUserLoggedIn() public view returns (bool) {
+        return userLoggedIn[msg.sender];
+    }
+
     // swaping of tokens
     function swapTokens(address _with, uint256 _amount) public {
         require(_with != msg.sender, "Can't swap with yourself");

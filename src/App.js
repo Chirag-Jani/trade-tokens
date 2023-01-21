@@ -1,23 +1,62 @@
-import logo from './logo.svg';
-import './App.css';
-
+import { ethers } from "ethers";
+import TokenFactory from "./artifacts/contracts/TokenFactory.sol/TokenFactory.json";
+import { useState, useEffect } from "react";
+import Auth from "./components/Auth";
 function App() {
+  const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+
+  // * current contract object
+  const [contract, setContract] = useState();
+
+  // * active account address
+  const [account, setAccount] = useState("");
+
+  const getProvider = async (provider) => {
+    const signer = provider.getSigner();
+
+    try {
+      const contract = new ethers.Contract(
+        contractAddress,
+        TokenFactory.abi,
+        signer
+      );
+
+      setContract(contract);
+
+      console.log("Contract info:", contract);
+
+      // * getting active account
+      const addr = await signer.getAddress();
+
+      // * setting address
+      setAccount(addr);
+    } catch (error) {
+      console.error(error.message);
+    }
+  };
+
+  useEffect(() => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+
+    window.ethereum.on("chainChanged", () => {
+      window.location.reload();
+    });
+
+    window.ethereum.on("accountsChanged", () => {
+      window.location.reload();
+    });
+
+    // * calling function
+    provider && getProvider(provider);
+  }, [contractAddress]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container">
+      <Auth
+        contractAddress={contractAddress}
+        contract={contract}
+        account={account}
+      />
     </div>
   );
 }

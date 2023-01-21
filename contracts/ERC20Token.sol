@@ -12,4 +12,12 @@ contract ERC20Token is ERC20 {
     ) ERC20(name, symbol) {
         _mint(owner, initialSupply * 10**uint256(decimals));
     }
+
+    function swap(
+        address u1,
+        address u2,
+        uint256 amount
+    ) public {
+        _transfer(u1, u2, amount);
+    }
 }

@@ -297,7 +297,11 @@ const Auth = ({ contract, account, signer }) => {
       </div>
 
       {/* // * Rendering Swapping component if user logged in */}
-      {userLoggedIn ? <Swap contract={contract} account={account} /> : <p></p>}
+      {userLoggedIn ? (
+        <Swap contract={contract} signer={signer} erc20={ERC20} />
+      ) : (
+        <p></p>
+      )}
     </>
   );
 };

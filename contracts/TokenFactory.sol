@@ -4,7 +4,6 @@ pragma solidity ^0.8.9;
 import "contracts/ERC20Token.sol";
 import "@openzeppelin/contracts/interfaces/IERC20.sol";
 
-// get back the token (reverse swap)
 // approval shit
 // reputation shit
 // user struct (with name, ref. code, ref. by, earned reputation, token reputation)
@@ -22,16 +21,16 @@ contract TokenFactory {
     event UserRegistred(address indexed User, address indexed Token);
 
     // to hold all the tokens
-    address[] allTokens;
+    // address[] allTokens;
 
     // instance for utility
     ERC20Token e;
 
-    //
-    mapping(address => ERC20Token) userContractAddress;
+    // storing token addresses for users
+    mapping(address => address[]) userTokens;
 
-    // to uset user's token address
-    mapping(address => address) userTokenAddress;
+    // to get user's token address
+    // mapping(address => address) userTokenAddress;
 
     // to map different tokens for an user
     mapping(address => mapping(address => uint256)) addressTokenBalance;
@@ -44,7 +43,7 @@ contract TokenFactory {
     mapping(string => bool) symbolExist;
 
     // token exist
-    mapping(address => bool) tokenExist;
+    mapping(address => mapping(address => bool)) tokenExist;
 
     // user logged in
     mapping(address => bool) userLoggedIn;
@@ -69,7 +68,7 @@ contract TokenFactory {
         symbolExist[_tokenSymbol] = true;
 
         // emit event
-        emit UserRegistred(msg.sender, userTokenAddress[msg.sender]);
+        emit UserRegistred(msg.sender, userTokens[msg.sender][0]);
     }
 
     // generating token while registration
@@ -79,19 +78,16 @@ contract TokenFactory {
         // new contract deployment
         e = new ERC20Token(_tokenName, _tokenSymbol, 18, 100, msg.sender);
 
-        // setting contract address of user
-        userContractAddress[msg.sender] = e;
-
         // converting to address type
         address tokenAddress = address(e);
 
         // pushing to all the tokens array
-        allTokens.push(tokenAddress);
+        // allTokens.push(tokenAddress);
 
         // updating mappings
         addressTokenBalance[msg.sender][tokenAddress] = 100 * 10**18;
-        userTokenAddress[msg.sender] = tokenAddress;
-        tokenExist[tokenAddress] = true;
+        userTokens[msg.sender].push(tokenAddress);
+        tokenExist[msg.sender][tokenAddress] = true;
     }
 
     function getMyTokenBalance() public view returns (uint256) {
@@ -115,7 +111,7 @@ contract TokenFactory {
         // address _tokenAddress = getTokenAddress(msg.sender);
 
         // check if token created
-        require(tokenExist[_tokenAddress], "Token does not exist");
+        require(tokenExist[msg.sender][_tokenAddress], "Token does not exist");
 
         // this will return user's balance of given token address
         uint256 b1 = ERC20(_tokenAddress).balanceOf(msg.sender);
@@ -135,7 +131,7 @@ contract TokenFactory {
         require(userExist[msg.sender], "User does not exist");
 
         // returning address of token
-        return userTokenAddress[userAddress];
+        return userTokens[userAddress][0];
     }
 
     // login user
@@ -157,6 +153,15 @@ contract TokenFactory {
     // to check if user logged in or not
     function checkUserLoggedIn() public view returns (bool) {
         return userLoggedIn[msg.sender];
+    }
+
+    // get all the tokens
+    function getTokens(address userAddress)
+        public
+        view
+        returns (address[] memory)
+    {
+        return userTokens[userAddress];
     }
 
     // swaping of tokens
@@ -183,6 +188,15 @@ contract TokenFactory {
         // transferring ERC20 here, as above is just updating variables and not real transfer
         ERC20TokenInterface(t1).swap(msg.sender, _with, _amount);
         ERC20TokenInterface(t2).swap(_with, msg.sender, _amount);
+
+        if (!tokenExist[msg.sender][t2]) {
+            userTokens[msg.sender].push(t2);
+            tokenExist[msg.sender][t2] = true;
+        }
+        if (!tokenExist[_with][t1]) {
+            userTokens[_with].push(t1);
+            tokenExist[_with][t1] = true;
+        }
     }
 
     // getting your tokens back
@@ -211,5 +225,7 @@ contract TokenFactory {
         // transferring ERC20 here, as above is just updating variables and not real transfer
         ERC20TokenInterface(t1).swap(_with, msg.sender, _amount);
         ERC20TokenInterface(t2).swap(msg.sender, _with, _amount);
+
+        // gotta remove the token address if amount gets to zero
     }
 }

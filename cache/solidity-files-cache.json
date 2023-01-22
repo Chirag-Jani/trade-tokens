@@ -185,8 +185,8 @@
       ]
     },
     "E:\\Web3.0\\SM 3.0\\tokenswaps\\contracts\\TokenFactory.sol": {
-      "lastModificationDate": 1674317087309,
-      "contentHash": "681066989e25f6b2eb1fe0b908e7a509",
+      "lastModificationDate": 1674365278222,
+      "contentHash": "53afcb18836395db63374ef512252d7c",
       "sourceName": "contracts/TokenFactory.sol",
       "solcConfig": {
         "version": "0.8.17",

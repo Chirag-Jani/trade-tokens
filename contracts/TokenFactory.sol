@@ -94,7 +94,19 @@ contract TokenFactory {
         tokenExist[tokenAddress] = true;
     }
 
-    // getting balance of a user's token
+    function getMyTokenBalance() public view returns (uint256) {
+        address _tokenAddress = getTokenAddress(msg.sender);
+
+        // this will return user's balance of given token address
+        uint256 b1 = ERC20(_tokenAddress).balanceOf(msg.sender);
+        uint256 b2 = addressTokenBalance[msg.sender][_tokenAddress];
+
+        require(b1 == b2, "Accounts mismatch");
+
+        return b1;
+    }
+
+    // getting balance of a user's swapped token
     function getTokenBalance(address _tokenAddress)
         public
         view

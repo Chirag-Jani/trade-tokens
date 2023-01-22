@@ -11,6 +11,9 @@ function App() {
   // * active account address
   const [account, setAccount] = useState("");
 
+  // * to store signer
+  const [signer, setSigner] = useState();
+
   const getProvider = async (provider) => {
     const signer = provider.getSigner();
 
@@ -22,6 +25,7 @@ function App() {
       );
 
       setContract(contract);
+      setSigner(signer);
 
       console.log("Contract info:", contract);
 
@@ -52,7 +56,7 @@ function App() {
 
   return (
     <div className="container">
-      <Auth contract={contract} account={account} />
+      <Auth contract={contract} account={account} signer={signer} />
     </div>
   );
 }
